@@ -16,6 +16,7 @@ async function getM2MToken(event, axios) {
         client_id: `${event.secrets.clientId}`,
         client_secret: `${event.secrets.clientSecret}`,
         audience: `https://${event.secrets.domain}/api/v2/`,
+        scope: 'update:users,update:current_user_identities',
       },
     };
     // Extract 'access_token' out of response
@@ -89,9 +90,11 @@ exports.onExecutePostLogin = async (event, api) => {
     const { data: candidateUsers } = await management.usersByEmail.getByEmail({
       email: event.user.email,
     });
+    debugger;
+    console.log('Candiate Users count:', candidateUsers.length);
+    console.log('Users:', candidateUsers);
 
     // Only one user is returned then no linking necessary
-    // if (candidateUsers.length == 1)  {
     if (!Array.isArray(candidateUsers)) {
       return;
     }
@@ -117,13 +120,19 @@ exports.onExecutePostLogin = async (event, api) => {
     // Call Management API for Account Link with M2M token from above.
     // Linking the old user into the new one.
     await linkUserAccounts(event, newToken, fullTargetId, axios);
+    // TODO: Link user ientities trough management.users.link
+    // TODO: Set custom claim
+    // TODO: Set user in current event object
+    // TODO: return user payload
 
     if(event.connection.strategy === 'auth0'){
       api.redirect.sendUserTo(`https://${event.secrets.appDomain}/api/auth/login?connection=${oldIdentity.connection}`)
+      //api.redirect.sendUserTo(`com.rombo.driver.auth0://dev-bhqrkjt1opmtbpiu.us.auth0.com/android/com.rombo.driver/callback?connection=${oldIdentity.connection}`)
       // If you want to prompt the user to sign in with username/password again.
       // api.redirect.sendUserTo(`http://localhost:3000/api/auth/login?connection=${event.connection.name}`)
     } else {
       api.redirect.sendUserTo(`https://${event.secrets.appDomain}/api/auth/login?connection=${event.connection.strategy}`);
+      //api.redirect.sendUserTo(`com.rombo.driver.auth0://dev-bhqrkjt1opmtbpiu.us.auth0.com/android/com.rombo.driver/callback?connection=${event.connection.strategy}`)
     }
 };
 
