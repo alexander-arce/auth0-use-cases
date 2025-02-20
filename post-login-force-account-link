@@ -91,6 +91,7 @@ exports.onExecutePostLogin = async (event, api) => {
     });
 
     // Only one user is returned then no linking necessary
+    // if (candidateUsers.length == 1)  {
     if (!Array.isArray(candidateUsers)) {
       return;
     }
