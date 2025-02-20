@@ -1,0 +1,44 @@
+{
+  "date": "2025-02-20T22:49:34.603Z",
+  "type": "w",
+  "description": "You are using Auth0 development keys which are only intended for use in development and testing. This connection (google-oauth2) should be configured with your own Development Keys to enable the consent page to show your logo instead of Auth0's. AUTH0 DEVELOPMENT KEYS SHOULD NOT BE USED ON PRODUCTION ENVIRONMENTS. To learn more about Development Keys please refer to https://auth0.com/docs/connections/social/devkeys.",
+  "connection": "google-oauth2",
+  "connection_id": "con_rWd1ZuO7CI0b9jUv",
+  "client_id": "65TvbftRFmzMDRKfQO02DdAFQbkTcxil",
+  "ip": "187.184.9.163",
+  "user_agent": "Chrome Mobile 133.0.0 / Android 10.0.0",
+  "user_id": "",
+  "user_name": "",
+  "strategy": "google-oauth2",
+  "strategy_type": "social",
+  "$event_schema": {
+    "version": "1.0.0"
+  },
+  "log_id": "90020250220224934620898000000000000001223372068558608412",
+  "tenant_name": "dev-bhqrkjt1opmtbpiu",
+  "_id": "90020250220224934620898000000000000001223372068558608412",
+  "isMobile": true,
+  "originalData": {
+    "date": "2025-02-20T22:49:34.603Z",
+    "type": "w",
+    "description": "You are using Auth0 development keys which are only intended for use in development and testing. This connection (google-oauth2) should be configured with your own Development Keys to enable the consent page to show your logo instead of Auth0's. AUTH0 DEVELOPMENT KEYS SHOULD NOT BE USED ON PRODUCTION ENVIRONMENTS. To learn more about Development Keys please refer to https://auth0.com/docs/connections/social/devkeys.",
+    "connection": "google-oauth2",
+    "connection_id": "con_rWd1ZuO7CI0b9jUv",
+    "client_id": "65TvbftRFmzMDRKfQO02DdAFQbkTcxil",
+    "ip": "187.184.9.163",
+    "user_agent": "Chrome Mobile 133.0.0 / Android 10.0.0",
+    "user_id": "",
+    "user_name": "",
+    "strategy": "google-oauth2",
+    "strategy_type": "social",
+    "$event_schema": {
+      "version": "1.0.0"
+    },
+    "log_id": "90020250220224934620898000000000000001223372068558608412",
+    "tenant_name": "dev-bhqrkjt1opmtbpiu",
+    "_id": "90020250220224934620898000000000000001223372068558608412",
+    "isMobile": true
+  },
+  "integrityRuleset": {},
+  "id": "90020250220224934620898000000000000001223372068558608412"
+}
