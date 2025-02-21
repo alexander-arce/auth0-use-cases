@@ -16,7 +16,6 @@ async function getM2MToken(event, axios) {
         client_id: `${event.secrets.clientId}`,
         client_secret: `${event.secrets.clientSecret}`,
         audience: `https://${event.secrets.domain}/api/v2/`,
-        scope: 'update:users,update:current_user_identities',
       },
     };
     // Extract 'access_token' out of response
@@ -51,12 +50,11 @@ async function linkUserAccounts(event, newToken, fullTargetId, axios) {
     }
   };
 
-  linkedUserAccounts = await axios.request(options).then(function (response) {
+  await axios.request(options).then(function (response) {
     console.log(response.data);
   }).catch(function (error) {
     console.error(error);
   });
-return linkedUserAccounts
 }
 
 /**
@@ -91,19 +89,23 @@ exports.onExecutePostLogin = async (event, api) => {
     const { data: candidateUsers } = await management.usersByEmail.getByEmail({
       email: event.user.email,
     });
-    debugger;
-    console.log('Candiate Users count:', candidateUsers.length);
-    console.log('Users:', candidateUsers);
+  
+    console.log('Candidate Users count:', candidateUsers.length);
+    
+    
 
     // Only one user is returned then no linking necessary
     if (!Array.isArray(candidateUsers)) {
       return;
     }
-
+    //console.log('candidateUsers:', candidateUsers);
     // Get the identities of the user
     const candidateIdentities = candidateUsers.flatMap((user) => user.identities);
+    
+    console.log('candidateIdentities:', candidateIdentities);
+    
     if(candidateIdentities.length <= 1) return;
-    console.log('candidateIdentities':, candidateIdentities);
+    
   
 
     // Get M2M token through Client Credentials Flow
@@ -113,7 +115,7 @@ exports.onExecutePostLogin = async (event, api) => {
     const oldIdentity = candidateIdentities.find(
       (identity) => identity.provider !== event.connection.strategy
     );
-    console.log('oldIdentity', oldIdentity);
+    console.log('oldIdentity:', oldIdentity);
 
     // UserID does not contain github|, or auth0|, or google by default
     const targetProvider = oldIdentity.provider;
@@ -122,31 +124,26 @@ exports.onExecutePostLogin = async (event, api) => {
  
     // Call Management API for Account Link with M2M token from above.
     // Linking the old user into the new one.
-    const linkedUserAccounts = await linkUserAccounts(event, newToken, fullTargetId, axios);
-    console.log('linkedUserAccounts',linkedUserAccounts);
-    // TODO: Link user ientities trough management.users.link
-    // TODO: Set custom claim
-    // TODO: Set user in current event object
-    // TODO: return user payload
+    await linkUserAccounts(event, newToken, fullTargetId, axios);
+    // Refresh user list after linking
+       // Search for other candidate users
+    const { data: users } = await management.usersByEmail.getByEmail({
+      email: event.user.email,
+    });
+    console.log('users after linking:', users)
+    const first_user = users.find(() => true)
+    console.log('First user:', first_user)
+   // Return the linked account instead so user can continue without re-authentication
+    event.user = {
+      ...first_user,
+      identities: first_user.identities
+    };
 
-    if(event.connection.strategy === 'auth0'){
-      api.redirect.sendUserTo(`https://${event.secrets.appDomain}/api/auth/login?connection=${oldIdentity.connection}`)
-      //api.redirect.sendUserTo(`com.rombo.driver.auth0://dev-bhqrkjt1opmtbpiu.us.auth0.com/android/com.rombo.driver/callback?connection=${oldIdentity.connection}`)
-      // If you want to prompt the user to sign in with username/password again.
-      // api.redirect.sendUserTo(`http://localhost:3000/api/auth/login?connection=${event.connection.name}`)
-    } else {
-      api.redirect.sendUserTo(`https://${event.secrets.appDomain}/api/auth/login?connection=${event.connection.strategy}`);
-      //api.redirect.sendUserTo(`com.rombo.driver.auth0://dev-bhqrkjt1opmtbpiu.us.auth0.com/android/com.rombo.driver/callback?connection=${event.connection.strategy}`)
+  return {
+    user: {
+      ...first_user,
+      identities: first_user.identities
     }
+  }
+
 };
-
-
-/**
-* Handler that will be invoked when this action is resuming after an external redirect. If your
-* onExecutePostLogin function does not perform a redirect, this function can be safely ignored.
-*
-* @param {Event} event - Details about the user and the context in which they are logging in.
-* @param {PostLoginAPI} api - Interface whose methods can be used to change the behavior of the login.
-*/
-// exports.onContinuePostLogin = async (event, api) => {
-// };
