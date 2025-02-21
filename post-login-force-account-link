@@ -51,11 +51,12 @@ async function linkUserAccounts(event, newToken, fullTargetId, axios) {
     }
   };
 
-  await axios.request(options).then(function (response) {
+  linkedUserAccounts = await axios.request(options).then(function (response) {
     console.log(response.data);
   }).catch(function (error) {
     console.error(error);
   });
+return linkedUserAccounts
 }
 
 /**
@@ -102,6 +103,7 @@ exports.onExecutePostLogin = async (event, api) => {
     // Get the identities of the user
     const candidateIdentities = candidateUsers.flatMap((user) => user.identities);
     if(candidateIdentities.length <= 1) return;
+    console.log('candidateIdentities':, candidateIdentities);
   
 
     // Get M2M token through Client Credentials Flow
@@ -111,6 +113,7 @@ exports.onExecutePostLogin = async (event, api) => {
     const oldIdentity = candidateIdentities.find(
       (identity) => identity.provider !== event.connection.strategy
     );
+    console.log('oldIdentity', oldIdentity);
 
     // UserID does not contain github|, or auth0|, or google by default
     const targetProvider = oldIdentity.provider;
@@ -119,7 +122,8 @@ exports.onExecutePostLogin = async (event, api) => {
  
     // Call Management API for Account Link with M2M token from above.
     // Linking the old user into the new one.
-    await linkUserAccounts(event, newToken, fullTargetId, axios);
+    const linkedUserAccounts = await linkUserAccounts(event, newToken, fullTargetId, axios);
+    console.log('linkedUserAccounts',linkedUserAccounts);
     // TODO: Link user ientities trough management.users.link
     // TODO: Set custom claim
     // TODO: Set user in current event object
